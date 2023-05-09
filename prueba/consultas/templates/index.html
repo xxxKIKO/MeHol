@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/estil.css' %}">
+    <title>MedHol</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    
+    <script src="https://kit.fontawesome.com/887a835504.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css">
+    <script src="https://kit.fontawesome.com/455d2522ea.js" crossorigin="anonymous"></script>
+</head>
+<body>
+	<header>
+        <div class="logo">
+            <img src="{% static 'imagenes/Hojas_verdes.png' %}" alt="Logo" style="height: 90px;">
+          
+			<nav>
+				<a href="/aboutus" class="nave">Acerca de</a>
+				<a href="/contactus" class="nave">Servicios</a>
+				<a href="/contactus" class="nave">Contactos</a>
+				<a href="#" class="nave">Galeria</a>
+				<a href="/pacienteclick" class="nave">Paciente</a>
+				<a href="/medicoclick" class="nave">Médico</a>
+				<a href="/asistenteclick" class="nave">Asistente</a>
+			</nav>
+
+			<div class="clearfix"></div>
+		</div>
+    </header>
+
+    <section class="content">
+        <div id="col01">
+            <h1>Objetivos y alcances</h1>
+			<br><br>			
+            <p>Medhol es un equipo de trabajo, enfocado a la prestación de servicios terapéuticos en atención a enfermedades y patologías.
+			<br><br>
+            Nuestro campo de atención es la salud en todos sus enfoques, ofreciendo una terapia meramente depurativa que ayuda a estabilizar los diferentes sistemas, hormonas y órganos, así como matrices, redes y demás componentes del cuerpo humano.
+            <br><br>
+            Es importante que sepan que cada persona la atendemos en la individualidad, porque en la salud, como en la vida, no hay patrones definidos.
+            <br><br>
+            La Terapia de planos es un modelo creado por su servidor, a partir del conocimiento y estudio de diferentes alternativas holísticas que se ha convertido en una clara técnica de curación en la que trabajamos es encontrar las causas de las enfermedades, no los síntomas. 
+            <br><br>
+            Si tú eres una persona que prefiere lo natural...
+			<br><br>
+            Si tú eres una persona que desea sentirse bien...
+            <br><br>
+            Vive la experiencia y transforma tu vida...
+            <br><br>
+            Soy tu amigo Ignacio Fermín, terapeuta holístico.
+            </p>
+        </div>
+
+        <div id="col02">
+            <img src="{% static 'imagenes/hombre_verde.jpg' %}" width=500px height=600px>
+        </div>
+        <div class="clearfix"></div>
+
+    </section>
+    
+    <section class="content">
+    <div class="Descripcion">
+        <a id="Acerca de"></a>
+        <h1>Acerca de</h1>
+        <p>Ignacio Fermín terapeuta holístico. Luego de haber trabajado con técnicas de imanes, desarrollado el conocimiento homeopático e incursionado en el conocimiento herbolario, ha desarrollado y creado la Terapia de planos, una técnica única, que permite identificar enfermedades, padecimientos físicos, emocionales y somáticos así como atenderlos de forma integral .
+        Combinamos la holística con el conocimiento homeopático, para atender las enfermedades desde sus causas.</p>
+        <div class="clearfix"></div>
+    </div>
+    <!--aqui empieza el carrousel-->
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="true">
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img src="{% static 'imagenes/docplanta.jpg' %}" class="d-block w-100" alt="...">
+          </div>
+          <div class="carousel-item">
+            <img src="{% static 'imagenes/docasistentes.jpg' %}" class="d-block w-100" alt="...">
+          </div>
+          <div class="carousel-item">
+            <img src="{% static 'imagenes/docpie.jpg' %}" class="d-block w-100" alt="...">
+          </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+      <!--aqui termina el carrousel-->
+      <a id="Servicios"></a>
+        <div class="wrapper">
+            <h2>Nuestros servicios</h2>
+            <p>Si haces tu diagnóstico a tiempo podemos prevenir muchas enfermedades; si lo haces cuando ya tienes algún padecimiento te podemos ayudar a atenderlo de forma integral, siempre, de manera natural.</p>
+
+            <div class="content-box">
+                <div class="card">
+                    
+                    <h2>Terapia de Planos</h2>
+                    <br>
+                    <p>La terapia de planos permite el rastreo de la persona, identifica padecimientos o patógenos que pudieran estar propiciando trastornos en nuestra salud, así como la evaluación energética de los pacientes. 
+<br>
+                     A través de la Terapia de planos podemos atender muchos temas de salud, de una manera integral y natural, con conocimiento, procedimientos no invasivos y, sobre todo, con respuestas claras.</p>
+             </div>
+
+             <div class="card">
+                
+                <h2>Tratamientos Naturales</h2>
+                <br>
+                <p>Si no has encontrado respuesta a tus enfermedades, te invito a que conozcas nuestra terapia y a que sientas sus beneficios.
+                    <br>
+                    NO te genera efecto secundario,  no se contrapone con otros tratamientos y tampoco es invasivo.
+                    
+                    es una alterantiva real para la atención de la salud de forma natural. 
+                    <br>
+                    Conoce esta alternativa holística y 100 por ciento natural.</p>
+         </div>
+
+        </div>
+    </div>
+    <br>
+
+</section>
+    <a id="Contactos"></a>
+    <footer class="pie-pagina">
+        <div class="grupo-1">
+            <div class="box">
+               </div>
+            <div class="box">
+                <h2>SIGUENOS</h2>
+                <div class="red-social">
+                    <p>
+                        <a id="ftr" href="https://www.facebook.com/MedHolMexico" class="fa fa-facebook"></a>
+                        <a id="ftr" href="https://api.whatsapp.com/send?phone=919572181024&text=Hello%20Sumit.%0d%0aHow%20are%20you%20%3f%0d%0aI%20came%20from%20your%20website.&source=&data=#" class="fa fa-whatsapp"></a>
+                        <a id="ftr" href="https://instagram.com/sumit.luv" class="fa fa-instagram"></a>
+                        <a id="ftr" href="https://twitter.com/sumitkumar1503" class="fa fa-twitter"></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="grupo-2">
+            <small>&copy; 2023 <b>MedHol</b> - Todos los Derechos Reservados.</small>
+        </div>
+    </footer>
+
+
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+</body>
+</html>

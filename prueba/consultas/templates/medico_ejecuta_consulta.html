@@ -1,0 +1,84 @@
+{% extends 'medico_base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+
+<head>
+
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<br><br>
+<!------ add appointment page by admin(sumit)  ---------->
+<div class="container">
+    <div class="row">
+      <div class="panel panel-primary" style="margin-left:5%;">
+        <div class="panel-heading" style="text-align:center;">
+          <h6 class="panel-title">Detalles de la consulta</h6>
+        </div>
+        <table class="table table-hover" id="dev-table">
+          <thead>
+            <tr>
+              <th>ID Cita</th>
+              <th>Nombre </th>
+              <th>Descripción</th>
+              <th>Celular</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          {% for a in citas_pacientes %}
+          <tr>
+            <td>{{a.idCita}}</td>
+            <td>{{a.nombrePaciente}} {{a.apellidoPaciente}}</td>
+            <td>{{a.comentarios}}</td>
+            <td>{{a.telefonoPaciente}}</td>
+            <td>{{a.fechaCita}}</td>   
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+  </div>
+<form method="post">
+  {% csrf_token %}
+  <div class="container register-form">
+    <div class="form">
+      <div class="note">
+        <p>Ejecución de Consulta</p>
+      </div>
+      <div class="form-content">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              {% render_field ConsultaForm.sintomas class="form-control" placeholder="Síntomas" %}
+            </div>
+            <div class="form-group">
+              {% render_field ConsultaForm.diagnostico class="form-control" placeholder="Diagnóstico" %}
+            </div>
+            <div class="form-group">
+              {% render_field ConsultaForm.tratamiento class="form-control" placeholder="Tratamiento" %}
+            </div>
+            <div class="form-group" id="id_fechaCita">
+              {% render_field CitasForm.fechaCita class="form-control" placeholder="Paciente" %}
+            </div>
+          </div>
+          
+          {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+          {% endif %}
+
+
+        </div>
+        <button type="submit" class="btnSubmit">Agendar</button>
+      </div>
+    </div>
+  </div>
+</form>
+
+
+
+{% endblock content %}
