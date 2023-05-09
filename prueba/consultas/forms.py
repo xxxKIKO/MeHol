@@ -61,6 +61,19 @@ class CitasForm(forms.ModelForm):
     def __str__(self):
         return self.pacienteId
 
+class ConsultasForm(forms.ModelForm):
+    medicoId=forms.ModelChoiceField(queryset=models.Medico.objects.all().filter(status=True),empty_label="Nombre del Médico", to_field_name="user_id")
+    pacienteId=forms.ModelChoiceField(queryset=models.Paciente.objects.all().filter(status=True),empty_label="Paciente y Síntomas", to_field_name="user_id")
+    idCIta=forms.ModelChoiceField(queryset=models.Citas.objects.all().filter(status=True),empty_label="Paciente y Síntomas", to_field_name="user_id")
+    class Meta:
+        widgets = {
+            'fechaCita': forms.DateTimeInput(attrs={'type': 'datetime-local','step': '1800'},format='%Y-%m-%dT%H:00:00')
+        }
+        model=models.Citas
+        fields=['descripcion','status','fechaCita']
+
+    def __str__(self):
+        return self.pacienteId
 
 class PacienteCitasForm(forms.ModelForm):
     medicoId=forms.ModelChoiceField(queryset=models.Medico.objects.all().filter(status=True),empty_label="Doctor Name and Department", to_field_name="user_id")
