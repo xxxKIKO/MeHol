@@ -3,6 +3,8 @@
 {% block content %}
 
 <head>
+<!--
+
 
   <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
@@ -10,6 +12,8 @@
 </head>
 <br><br>
 <!------ médico ejecuta consulta ---------->
+
+<!--
 <div class="container">
     <div class="row">
       <div class="panel panel-primary" style="margin-left:5%;">
@@ -76,4 +80,20 @@
     </div>
   </div>
 </form>
+
+-->
+
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Nueva consulta para {{ cita.pacienteId.get_name }}</h2>
+  <h4>Fecha de la cita: {{ cita.fechaCita }}</h4>
+  <h4>Medico: {{ cita.medicoId.get_name }}</h4>
+
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Guardar</button>
+  </form>
+{% endblock %}
 {% endblock content %}
