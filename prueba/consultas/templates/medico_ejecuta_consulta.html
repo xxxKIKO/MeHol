@@ -1,72 +1,148 @@
 {% extends 'medico_base.html' %}
+{% load static %}
 {% load widget_tweaks %}
 {% block content %}
 
-<head>
-<!--
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+<style>
+    .form-content {
+      max-width: 600px; /* Ancho máximo del contenedor del formulario */
+      margin: 0 auto; /* Centrar el contenedor */
+    }
 
-  <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-</head>
-<br><br>
+    .form-group input {
+      width: 100%; /* Los campos de formulario ocupan el 100% del ancho máximo */
+      box-sizing: border-box; /* Incluye el padding y el borde en el ancho del elemento */
+    }
+
+</style>
+
 <!------ médico ejecuta consulta ---------->
-
-<!--
 <div class="container">
     <div class="row">
-      <div class="panel panel-primary" style="margin-left:5%;">
+      <div class="panel panel-primary" style="margin:0 auto;">
         <div class="panel-heading" style="text-align:center;">
           <h6 class="panel-title">Detalles de la consulta</h6>
         </div>
         <table class="table table-hover" id="dev-table">
           <thead>
             <tr>
+              <th>Nombre del médico</th>
               <th>ID Cita</th>
-              <th>Nombre </th>
+              <th>Nombre del paciente</th>
               <th>Descripción</th>
               <th>Celular</th>
               <th>Fecha</th>
             </tr>
           </thead>
-          {% for a in citas_pacientes %}
+
           <tr>
-            <td>{{a.idCita}}</td>
-            <td>{{a.nombrePaciente}} {{a.apellidoPaciente}}</td>
-            <td>{{a.comentarios}}</td>
-            <td>{{a.telefonoPaciente}}</td>
-            <td>{{a.fechaCita}}</td>   
+            <td>{{cita.medicoId.get_name}}</td>
+            <td>{{cita.idCita}}</td>
+            <td>{{cita.pacienteId.get_name}}</td>
+            <td>{{cita.descripcion}}</td>
+            <td>{{cita.pacienteId.celular}}</td>
+            <td>{{ cita.fechaCita }}</td>   
           </tr>
-          {% endfor %}
+
         </table>
       </div>
     </div>
   </div>
-<form method="post">
+<form method="post" novalidate>
   {% csrf_token %}
   <div class="container register-form">
     <div class="form">
       <div class="note">
-        <p>Ejecución de Consulta</p>
+        <h2 align="center">Ejecución de Consulta</h2>
       </div>
       <div class="form-content">
         <div class="row">
           <div class="col-md-12">
+            <div id="speech-container" align="center">
+              <div class="form-group" id="speech-input">
+                {% render_field form.sintomas class="form-control" placeholder="Síntomas" id="sintomas-input" %}
+                <a id="record-sintomas" class="btn btn-info" style="margin: 10px 20px;">Tomar mensaje con voz</a>
+              </div>
             <div class="form-group">
-              {% render_field ConsultaForm.sintomas class="form-control" placeholder="Síntomas" %}
+              {% render_field form.diagnostico class="form-control" placeholder="Diagnóstico" id="diagnostico-input" %}
+              <a id="record-diagnostico" class="btn btn-info" style="margin: 10px 20px;">Tomar mensaje con voz</a>
             </div>
             <div class="form-group">
-              {% render_field ConsultaForm.diagnostico class="form-control" placeholder="Diagnóstico" %}
-            </div>
-            <div class="form-group">
-              {% render_field ConsultaForm.tratamiento class="form-control" placeholder="Tratamiento" %}
-            </div>
-            <div class="form-group" id="id_fechaCita">
-              {% render_field CitasForm.fechaCita class="form-control" placeholder="Paciente" %}
+              {% render_field form.tratamiento class="form-control" placeholder="Tratamiento" id="tratamiento-input" %}
+              <a id="record-tratamiento" class="btn btn-info" style="margin: 10px 20px;">Tomar mensaje con voz</a>
             </div>
           </div>
-          
+                            <!-- para el reconocimiento de voz -->
+                            <script>
+                              // Obtener los botones y cajas de texto correspondientes
+         const recordSintomasBtn = document.querySelector("#record-sintomas");
+         const sintomasInput = document.querySelector("#sintomas-input");
+         
+         const recordDiagnosticoBtn = document.querySelector("#record-diagnostico");
+         const diagnosticoInput = document.querySelector("#diagnostico-input");
+         
+         const recordTratamientoBtn = document.querySelector("#record-tratamiento");
+         const tratamientoInput = document.querySelector("#tratamiento-input");
+         
+         // Función para el reconocimiento de voz
+         function reconocimientoDeVoz(input) {
+           // Comprueba si el navegador soporta la API de reconocimiento de voz
+           if (!('webkitSpeechRecognition' in window)) {
+             console.log("El navegador no soporta la API de reconocimiento de voz");
+           } else {
+             // Crea una instancia de la API de reconocimiento de voz
+             const recognition = new webkitSpeechRecognition();
+             recognition.interimResults = true;
+             recognition.lang = "es-ES";
+         
+             // Referencia al elemento de texto donde se mostrará el mensaje dictado
+             let speechInput = input;
+             let previousTranscript = "";
+         
+             // Inicia el reconocimiento de voz
+             recognition.start();
+         
+             // Escucha los resultados parciales y finales del reconocimiento de voz
+             recognition.addEventListener("result", e => {
+               const transcript = Array.from(e.results)
+                 .map(result => result[0])
+                 .map(result => result.transcript)
+                 .join("");
+               speechInput.value = previousTranscript + transcript;
+               // Finaliza el reconocimiento de voz cuando el usuario deja de hablar
+               if (e.results[0].isFinal) {
+                 recognition.stop();
+               }
+         
+             });
+             previousTranscript = speechInput.value + '\n';
+             // Muestra un error si ocurre algún problema con el reconocimiento de voz
+             recognition.addEventListener("error", e => {
+               console.log("Error en el reconocimiento de voz: " + e.error);
+             });
+           }
+         }
+         
+         // Escuchar evento click en el botón para el reconocimiento de voz de los síntomas
+         recordSintomasBtn.addEventListener("click", function() {
+           reconocimientoDeVoz(sintomasInput);
+         });
+         
+         // Escuchar evento click en el botón para el reconocimiento de voz de la descripción
+         recordDiagnosticoBtn.addEventListener("click", function() {
+           reconocimientoDeVoz(diagnosticoInput);
+         });
+         
+         // Escuchar evento click en el botón para el reconocimiento de voz del diagnóstico
+         recordTratamientoBtn.addEventListener("click", function() {
+           reconocimientoDeVoz(tratamientoInput);
+         });
+                             </script>
           {% if messages %}
             <ul class="messages">
                 {% for message in messages %}
@@ -75,25 +151,10 @@
             </ul>
           {% endif %}
         </div>
-        <button type="submit" class="btnSubmit">Agendar</button>
+        <button type="submit" class="btn btn-success" style="margin: 0 auto;" href="{% url '' %}">Terminar Consulta</button>
       </div>
     </div>
   </div>
 </form>
-
--->
-
-{% extends 'base.html' %}
-
-{% block content %}
-  <h2>Nueva consulta para {{ cita.pacienteId.get_name }}</h2>
-  <h4>Fecha de la cita: {{ cita.fechaCita }}</h4>
-  <h4>Medico: {{ cita.medicoId.get_name }}</h4>
-
-  <form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Guardar</button>
-  </form>
-{% endblock %}
 {% endblock content %}
+

@@ -85,6 +85,7 @@ urlpatterns = [
     #todas las urls del médico
     path('medico_dashboard', views.medico_dashboard_view,name='medico_dashboard'),
     path('med_eliminar_cita/<int:pk>', views.med_eliminar_cita_view,name='med_eliminar_cita'),
+    path('medico_ejecuta_consulta/<int:pk>', views.medico_ejecuta_consulta_view,name='medico_ejecuta_consulta'),
         #todas las vistas para el calendario
     path('all_events', views.all_events, name='all_events'),
 

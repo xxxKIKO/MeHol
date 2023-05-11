@@ -7,7 +7,7 @@
 <br><br><br><br>
 <div class="container">
   <div class="row">
-    <div class="panel panel-primary" style="margin-left:5%;">
+    <div class="panel panel-primary" style="margin:0 auto;">
       <div class="panel-heading" style="text-align:center;">
         <h6 class="panel-title">Citas del día</h6>
       </div>
@@ -29,7 +29,7 @@
           <td>{{a.comentarios}}</td>
           <td>{{a.telefonoPaciente}}</td>
           <td>{{a.fechaCita}}</td>   
-          <td><a class="btn btn-success" href="{% url '' %}"><span class="bi bi-play-circle"></span>Ejecutar</a></td>
+          <td><a class="btn btn-success" href="{% url 'medico_ejecuta_consulta' a.idCita %}"><span class="bi bi-play-circle"></span>Ejecutar</a></td>
           <td><a class="btn btn-danger" href="{% url 'med_eliminar_cita' a.idCita %}"><span class="bi bi-play-circle"></span>Eliminar</a></td>
         </tr>
         {% endfor %}
@@ -53,6 +53,10 @@
   .fc-title{
         color: white !important;
     }
+    #calendar {
+        height: 90%;
+        margin-bottom: 20px;
+    }
 </style>
 <!-- estos son para el calendario, aqui termina-->
 
@@ -70,6 +74,7 @@
               center: 'title',
               right: 'month,agendaWeek,agendaDay'
           },
+          defaultView: 'agendaDay',
           displayEventTime: true,
           events: '/all_events',
           selectable: false,
@@ -169,12 +174,9 @@ function displayMessage(message) {
 <br/>
 <h2 align="center"><a href="#">Calendario de Citas</a></h2>
 <br/>
-<div class="container">
+<div class="container-fluid">
     <div id="calendar"></div>
 </div>
 <!-- aqui termina lo del calendario-->
-
-
-
 {% endblock content %}
 

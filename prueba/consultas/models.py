@@ -56,16 +56,18 @@ class Citas(models.Model):
     fechaCita=models.DateTimeField(default=datetime.now)
     descripcion=models.TextField(max_length=500)
     status=models.BooleanField(default=False)
+    ejecutada=models.BooleanField(default=False)
 
 class Consulta(models.Model):
     idConsulta = models.AutoField(primary_key=True)
     pacienteId = models.ForeignKey(Paciente, on_delete=models.CASCADE, default=0)
     medicoId = models.ForeignKey(Medico, on_delete=models.CASCADE, default=0)
-    idCIta = models.ForeignKey(Citas, on_delete=models.CASCADE, default=0)
+    idCita = models.ForeignKey(Citas, on_delete=models.CASCADE, default=0)
     fechaCita = models.DateTimeField(default=datetime.now)
     sintomas = models.TextField(max_length=500)
     diagnostico = models.TextField(max_length=500)
     tratamiento = models.TextField(max_length=500)
+    
 
 class CuentaPaciente(models.Model):
     pacienteId=models.ForeignKey(Paciente, on_delete=models.CASCADE, default=0)

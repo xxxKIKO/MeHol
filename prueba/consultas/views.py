@@ -11,6 +11,10 @@ from django.db.models import Q
 from .models import Citas
 from django.contrib import messages
 
+from django.shortcuts import render, get_object_or_404, redirect
+from .forms import ConsultaForm
+from .models import Citas, Consulta
+
 
 # Vista de inicio
 def home_view(request):
@@ -545,43 +549,6 @@ def validar_cita(medico_id, fecha_cita):
     return True
 
 
-"""
-funcion original, veremos si regresamos aqui...
-def asistente_agregar_citas_view(request):
-
-    #funcion para validar las citas
-    from django.core.exceptions import ValidationError
-
-    def validar_cita(medico, fecha_cita):
-        # Verificar si ya existe una cita programada para ese médico en esa fecha y hora
-        citas_programadas = Citas.objects.filter(medicoId__user__id=medico, fechaCita=fecha_cita)
-        if citas_programadas.exists():
-            raise ValidationError("El horario ya está ocupado. Por favor, seleccione un horario diferente.")
-        return True
-
-
-
-    CitasForm=forms.CitasForm()
-    mydict={'CitasForm':CitasForm,}
-    if request.method=='POST':
-        CitasForm=forms.CitasForm(request.POST)
-        if CitasForm.is_valid():
-            cita=CitasForm.save(commit=False)
-            medico= models.Medico.objects.get(user_id=request.POST.get('medicoId'))
-            cita.medicoId=medico
-            print(request.POST.get('pacienteId'))
-            paciente= models.Paciente.objects.get(user_id=request.POST.get('pacienteId'))
-            
-            cita.pacienteId=paciente
-            cita.medicoNombre=models.User.objects.get(id=request.POST.get('medicoId')).first_name
-            cita.pacienteNombre=models.User.objects.get(id=request.POST.get('pacienteId')).first_name
-            cita.fechaCita=request.POST.get('fechaCita')
-            cita.status=True
-            cita.save()
-        return HttpResponseRedirect('asistente_ver_citas')
-    return render(request,'asistente_agregar_cita.html',context=mydict)
-"""
-
 @login_required(login_url='asistentelogin')
 @user_passes_test(is_asistente)
 def asistente_aprobar_citas_view(request):
@@ -662,8 +629,8 @@ def medico_dashboard_view(request):
     #for  table in doctor dashboard
     fechadehoy=date.today()
     print("la fecha de hoy es: ",fechadehoy)
-    citas=models.Citas.objects.all().filter(status=True, medicoId__user__id=medico_id,  fechaCita__date=fechadehoy).order_by('-idCita')
-    citasdehoy=models.Citas.objects.all().filter(status=True, medicoId__user__id=medico_id,  fechaCita__date=fechadehoy).order_by('-idCita').count()
+    citas=models.Citas.objects.all().filter(ejecutada=False, status=True, medicoId__user__id=medico_id,  fechaCita__date=fechadehoy).order_by('-idCita')
+    citasdehoy=models.Citas.objects.all().filter(ejecutada=False, status=True, medicoId__user__id=medico_id,  fechaCita__date=fechadehoy).order_by('-idCita').count()
     print("las citas de hoy son:", citasdehoy)
     #para combinar los datos de citas y pacientes
     citas_pacientes = []
@@ -712,8 +679,27 @@ def med_eliminar_cita_view(request,pk):
     cita.delete()
     return redirect('medico_dashboard')
 
-
-
+#vista para la ejecución de la consulta
+@login_required(login_url='medicologin')
+@user_passes_test(is_medico)
+def medico_ejecuta_consulta_view(request, pk):
+    cita = get_object_or_404(Citas, idCita=pk)
+    medico = models.Medico.objects.get(user__id=request.user.id) #para la foto del medico en el sidebar
+    if request.method == 'POST':
+        form = ConsultaForm(request.POST)
+        if form.is_valid():
+            consulta = form.save(commit=False)
+            consulta.pacienteId = cita.pacienteId
+            consulta.medicoId = cita.medicoId
+            consulta.idCita = cita
+            consulta.save()
+            cita.status = True
+            cita.ejecutada = True
+            cita.save()
+            return redirect('medico_dashboard')
+    else:
+        form = ConsultaForm()
+    return render(request, 'medico_ejecuta_consulta.html', {'form': form, 'cita': cita, 'medico':medico})
 
 #---------------------------------------------------------------------------------
 #------------------------ COMIENZAN LAS VISTAS DEL PACIENTE ----------------------
