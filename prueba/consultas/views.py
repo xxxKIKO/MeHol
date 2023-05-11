@@ -425,7 +425,7 @@ def alta_paciente_view(request,pk):
         patientDict.update(feeDict)
         #for updating to database patientDischargeDetails (pDD)
         pDD=models.CuentaPaciente()
-        pDD.pacienteId=pk
+        pDD.pacienteId=paciente
         pDD.pacienteNombre=paciente.get_name
         pDD.medicoAsignadoNombre=medicoAsignado[0].first_name
         pDD.medicoAsignadoApellido=medicoAsignado[0].last_name
@@ -599,16 +599,17 @@ def actualizar_cita_view(request,pk):
             cita.save()
             return redirect('asistente_ver_citas')
     return render(request,'asistente_actualizar_cita.html',context=mydict)
+
+#vista para ver las consultas por cobrar
+@login_required(login_url='asistentelogin')
+@user_passes_test(is_asistente)
+def asistente_citasporcobrar_view(request):
+    #those whose approval are needed
+    citas=models.Citas.objects.all().filter(ejecutada=True, cobrada=False)
+    return render(request,'asistente_citasporcobrar.html',{'citas':citas})
 #---------------------------------------------------------------------------------
 #------------------------ TERMINAN LAS VISTAS DEL ASISTENTE ------------------------------
 #---------------------------------------------------------------------------------
-@login_required(login_url='asistentelogin')
-@user_passes_test(is_asistente)
-def eliminar_cita_view(request,pk):
-    cita=models.Citas.objects.get(idCita=pk)
-    cita.delete()
-    return redirect('asistente_ver_citas')
-
 
 
 #---------------------------------------------------------------------------------
@@ -632,6 +633,7 @@ def medico_dashboard_view(request):
     citas=models.Citas.objects.all().filter(ejecutada=False, status=True, medicoId__user__id=medico_id,  fechaCita__date=fechadehoy).order_by('-idCita')
     citasdehoy=models.Citas.objects.all().filter(ejecutada=False, status=True, medicoId__user__id=medico_id,  fechaCita__date=fechadehoy).order_by('-idCita').count()
     print("las citas de hoy son:", citasdehoy)
+
     #para combinar los datos de citas y pacientes
     citas_pacientes = []
     for cita in citas:
@@ -671,14 +673,6 @@ def medico_dashboard_view(request):
     }
     return render(request,'medico_dashboard.html',context=mylista)
 
-#para que el medico pueda eliminar las citas
-@login_required(login_url='medicologin')
-@user_passes_test(is_medico)
-def med_eliminar_cita_view(request,pk):
-    cita=models.Citas.objects.get(idCita=pk)
-    cita.delete()
-    return redirect('medico_dashboard')
-
 #vista para la ejecución de la consulta
 @login_required(login_url='medicologin')
 @user_passes_test(is_medico)
@@ -701,6 +695,51 @@ def medico_ejecuta_consulta_view(request, pk):
         form = ConsultaForm()
     return render(request, 'medico_ejecuta_consulta.html', {'form': form, 'cita': cita, 'medico':medico})
 
+#vista para que el medico vea todas sus citas
+@login_required(login_url='medicologin')
+@user_passes_test(is_medico)
+def medico_ver_citas_view(request):
+    medico = models.Medico.objects.get(user__id=request.user.id)
+    medico_id=medico.user.id
+    citas=models.Citas.objects.all().filter(status=True, medicoId__user__id=medico_id).order_by('-idCita')
+    return render(request,'medico_ver_citas.html',{'citas':citas, 'medico':medico})
+
+
+
+#para que el medico pueda eliminar las citas
+@login_required(login_url='medicologin')
+@user_passes_test(is_medico)
+def med_eliminar_cita_view(request,pk):
+    cita=models.Citas.objects.get(idCita=pk)
+    cita.delete()
+    return redirect('medico_dashboard')
+
+
+#vista para que el medico pueda actualizar sus citas
+@login_required(login_url='medicologin')
+@user_passes_test(is_medico)
+def medico_actualizar_cita_view(request,pk):
+    cita=models.Citas.objects.get(idCita=pk)
+    CitasForm=forms.CitasForm(request.FILES,instance=cita)
+    mydict={'CitasForm':CitasForm}
+    if request.method=='POST':
+        CitasForm=forms.CitasForm(request.POST,request.FILES,instance=cita)
+        if CitasForm.is_valid():
+            cita=CitasForm.save()
+            cita=CitasForm.save(commit=False)
+            cita.status=True
+            cita.save()
+            return redirect('medico_ver_citas')
+    return render(request,'medico_actualizar_cita.html',context=mydict)
+
+#vista para la lista de pacientes que tiene el medico bajo tratamiento
+@login_required(login_url='medicologin')
+@user_passes_test(is_medico)
+def medico_ver_pacientes_view(request):
+    medico = models.Medico.objects.get(user__id=request.user.id)
+    medico_id=medico.user.id
+    pacientes=models.Paciente.objects.all().filter(status=True, medicoAsignadoId=medico_id)
+    return render(request,'medico_ver_pacientes.html',{'pacientes':pacientes, 'medico':medico})
 #---------------------------------------------------------------------------------
 #------------------------ COMIENZAN LAS VISTAS DEL PACIENTE ----------------------
 #---------------------------------------------------------------------------------

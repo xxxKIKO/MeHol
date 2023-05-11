@@ -81,11 +81,15 @@ urlpatterns = [
     path('rechazar_cita/<int:pk>', views.rechazar_cita_view,name='rechazar_cita'),
     path('eliminar_cita/<int:pk>', views.eliminar_cita_view,name='eliminar_cita'),
     path('actualizar_cita/<int:pk>', views.actualizar_cita_view,name='actualizar_cita'),
+    path('asistente_citasporcobrar', views.asistente_citasporcobrar_view,name='asistente_citasporcobrar'),
 
     #todas las urls del médico
     path('medico_dashboard', views.medico_dashboard_view,name='medico_dashboard'),
     path('med_eliminar_cita/<int:pk>', views.med_eliminar_cita_view,name='med_eliminar_cita'),
     path('medico_ejecuta_consulta/<int:pk>', views.medico_ejecuta_consulta_view,name='medico_ejecuta_consulta'),
+    path('medico_ver_citas', views.medico_ver_citas_view,name='medico_ver_citas'),
+    path('medico_actualizar_cita/<int:pk>', views.medico_actualizar_cita_view,name='medico_actualizar_cita'),
+    path('medico_ver_pacientes', views.medico_ver_pacientes_view,name='medico_ver_pacientes'),
         #todas las vistas para el calendario
     path('all_events', views.all_events, name='all_events'),
 

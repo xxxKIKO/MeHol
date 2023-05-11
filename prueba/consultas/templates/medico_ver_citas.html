@@ -1,0 +1,195 @@
+{% extends 'medico_base.html' %}
+{% block content %}
+
+<head>
+  <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+  <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+
+  <style media="screen">
+    a:link {
+      text-decoration: none;
+    }
+
+    h6 {
+      text-align: center;
+    }
+
+    .row {
+      margin: 100px;
+    }
+  </style>
+</head>
+
+<div class="container">
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h6 class="panel-title">Citas</h6>
+    </div>
+    <table class="table table-hover" id="dev-table">
+      <thead>
+        <tr>
+          <th>Nombre del Doctor</th>
+          <th>Nombre del Paciente</th>
+          <th>Descripción</th>
+          <th>Fecha</th>
+          <th>Modificar</th>
+          <th>Eliminar</th>
+        </tr>
+      </thead>
+      {% for a in citas %}
+      <tr>
+        <td> {{a.medicoNombre}}</td>
+        <td>{{a.pacienteNombre}}</td>
+        <td>{{a.descripcion}}</td>
+        <td>{{a.fechaCita}}</td>
+        <td><a class="btn btn-primary btn-xs" href="{% url 'actualizar_cita' a.idCita  %}"><span class="glyphicon glyphicon-edit"></span></a></td>
+        <td><a class="btn btn-danger btn-xs" href="{% url 'med_eliminar_cita' a.idCita  %}"><span class="glyphicon glyphicon-trash"></span></a></td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+
+<!-- aqui inicia lo del calendario-->
+<!-- estos son para el calendario-->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.css"/>
+<!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.6/css/bootstrap.css"/>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+<style type="text/css">
+  .fc-title{
+        color: white !important;
+    }
+    #calendar {
+        height: 90%;
+        margin-bottom: 20px;
+    }
+</style>
+<!-- estos son para el calendario, aqui termina-->
+
+<script>
+
+  /*------------------------------------------
+  --------------------------------------------
+  Calendario 
+  --------------------------------------------
+  --------------------------------------------*/
+  $(document).ready(function () {
+      var calendar = $('#calendar').fullCalendar({
+          header: {
+              left: 'prev,next today',
+              center: 'title',
+              right: 'month,agendaWeek,agendaDay'
+          },
+          displayEventTime: true,
+          events: '/all_events',
+          selectable: false,
+          selectHelper: false,
+          editable: false,
+          eventLimit: true,
+          select: function (start, end, allDay) {
+              var title = prompt("Enter Event Title");
+              if (title) {
+                  var start = $.fullCalendar.formatDate(start, "Y-MM-DDTHH:mm:ss");
+                  var end = $.fullCalendar.formatDate(end, "Y-MM-DDTHH:mm:ss");
+                  $.ajax({
+                      type: "GET",
+                      url: '/add_event',
+                      data: {'title': title, 'start': start, 'end': end},
+                      dataType: "json",
+                      success: function (data) {
+                          calendar.fullCalendar('refetchEvents');
+                          displayMessage("Event Created Successfully");
+                      },
+                      error: function (data) {
+                          alert('There is a problem!!!');
+                      }
+                  });
+              }
+          },
+          eventResize: function (event) {
+              var start = $.fullCalendar.formatDate(event.start, "Y-MM-DD");
+              var end = $.fullCalendar.formatDate(event.end, "Y-MM-DD");
+              var title = event.title;
+              var id = event.id;
+              $.ajax({
+                  type: "GET",
+                  url: '/update',
+                  data: {'title': title, 'start': start, 'end': end, 'id': id},
+                  dataType: "json",
+                  success: function (data) {
+                      calendar.fullCalendar('refetchEvents');
+                      displayMessage("Event Updated Successfully");
+                  },
+                  error: function (data) {
+                      alert('There is a problem!!!');
+                  }
+              });
+          },
+          eventDrop: function (event) {
+              var start = $.fullCalendar.formatDate(event.start, "Y-MM-DD");
+              var end = $.fullCalendar.formatDate(event.end, "Y-MM-DD");
+              var title = event.title;
+              var id = event.id;
+              $.ajax({
+                  type: "GET",
+                  url: '/update',
+                  data: {'title': title, 'start': start, 'end': end, 'id': id},
+                  dataType: "json",
+                  success: function (data) {
+                      calendar.fullCalendar('refetchEvents');
+                      displayMessage("Event Updated Successfully");
+                  },
+                  error: function (data) {
+                      alert('There is a problem!!!');
+                  }
+              });
+          },
+          eventClick: function (event) {
+              if (confirm("Are you sure you want to remove it?")) {
+                  var id = event.id;
+                  $.ajax({
+                      type: "GET",
+                      url: '/remove',
+                      data: {'id': id},
+                      dataType: "json",
+                      success: function (data) {
+                          calendar.fullCalendar('refetchEvents');
+                          displayMessage("Event Delete Successfully");
+                      },
+                      error: function (data) {
+                          alert('There is a problem!!!');
+                      }
+                  });
+              }
+          },
+      });
+  });
+
+/*------------------------------------------
+--------------------------------------------
+Toastr Success Code
+--------------------------------------------
+--------------------------------------------*/
+function displayMessage(message) {
+  toastr.success(message, 'Event');
+} 
+
+</script>
+
+
+<br/>
+<h2 align="center"><a href="#">Calendario de Citas</a></h2>
+<br/>
+<div class="container-fluid">
+    <div id="calendar"></div>
+</div>
+<!-- aqui termina lo del calendario-->
+{% endblock content %}
+

@@ -57,6 +57,8 @@ class Citas(models.Model):
     descripcion=models.TextField(max_length=500)
     status=models.BooleanField(default=False)
     ejecutada=models.BooleanField(default=False)
+    cobrada=models.BooleanField(default=False)
+
 
 class Consulta(models.Model):
     idConsulta = models.AutoField(primary_key=True)
