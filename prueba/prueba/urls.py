@@ -82,6 +82,8 @@ urlpatterns = [
     path('eliminar_cita/<int:pk>', views.eliminar_cita_view,name='eliminar_cita'),
     path('actualizar_cita/<int:pk>', views.actualizar_cita_view,name='actualizar_cita'),
     path('asistente_citasporcobrar', views.asistente_citasporcobrar_view,name='asistente_citasporcobrar'),
+    path('asistente_cobrar_cita/<int:pk>', views.asistente_cobrar_cita_view,name='asistente_cobrar_cita'),
+    path('asistente_descarga_cobro/<int:pk>', views.asistente_descarga_cobro_view,name='asistente_descarga_cobro'),
 
     #todas las urls del médico
     path('medico_dashboard', views.medico_dashboard_view,name='medico_dashboard'),

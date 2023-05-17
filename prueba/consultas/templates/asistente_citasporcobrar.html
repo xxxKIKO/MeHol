@@ -42,8 +42,8 @@
         <td>{{a.pacienteId.user.first_name}} {{a.pacienteId.user.last_name}}</td>
         <td>{{a.descripcion}}</td>
         <td>{{a.fechaCita}}</td>
-        <td><a class="btn btn-primary btn-sm" href="{% url ''  %}"><span class="glyphicon glyphicon-ok"></span></a></td>
-        <td><a class="btn btn-success btn-sm" href="{% url ''  %}"><span class="glyphicon glyphicon-trash"></span></a></td>
+        <td><a class="btn btn-primary btn-sm" href="{% url 'asistente_cobrar_cita' a.idCita %}"><span class="glyphicon glyphicon-usd"></span></a></td>
+        <td><a class="btn btn-success btn-sm" href="{% url ''  %}"><span class="glyphicon glyphicon-gift"></span></a></td>
       </tr>
       {% endfor %}
     </table>

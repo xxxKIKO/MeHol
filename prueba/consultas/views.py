@@ -7,7 +7,6 @@ from django.core.mail import send_mail
 from django.contrib.auth.decorators import login_required, user_passes_test
 from datetime import datetime, timedelta, date
 from django.conf import settings
-from django.db.models import Q
 from .models import Citas
 from django.contrib import messages
 
@@ -399,6 +398,7 @@ def asistente_alta_paciente_view(request):
 @user_passes_test(is_asistente)
 def alta_paciente_view(request,pk):
     paciente=models.Paciente.objects.get(id=pk)
+    cita=models.Citas.objects.get(pacienteId__user__id=paciente.user.id)
     dias=(date.today()-paciente.fechadeadmision) #2 days, 0:00:00
     medicoAsignado=models.User.objects.all().filter(id=paciente.medicoAsignadoId)
     d=dias.days # only how many day that is 2
@@ -425,6 +425,7 @@ def alta_paciente_view(request,pk):
         patientDict.update(feeDict)
         #for updating to database patientDischargeDetails (pDD)
         pDD=models.CuentaPaciente()
+        pDD.idCita=cita
         pDD.pacienteId=paciente
         pDD.pacienteNombre=paciente.get_name
         pDD.medicoAsignadoNombre=medicoAsignado[0].first_name
@@ -485,6 +486,102 @@ def paciente_descarga_cuenta_view(request,pk):
     }
     return render_to_pdf('descargar_cuenta.html',dict)
 
+#desde aqui son las vistas para cobrar la cita------------------------------
+@login_required(login_url='asistentelogin')
+@user_passes_test(is_asistente)
+def asistente_cobrar_cita_view(request,pk):
+    d=0
+    cita=models.Citas.objects.get(idCita=pk)
+    medico=cita.medicoId
+    paciente=cita.pacienteId
+    listaDatos={
+        'idCita':cita.idCita,
+        'pacienteNombre':paciente.user.first_name,
+        'pacienteApellido':paciente.user.last_name,
+        'medicoNombre':medico.user.first_name,
+        'medicoApellido':medico.user.last_name,
+        'celular':paciente.celular,
+        'domicilio':paciente.domicilio,
+        'sintomas':paciente.sintomas,
+        'fechaCita':cita.fechaCita,
+        'hoy':date.today(),
+    }
+    if request.method == 'POST':
+        listaCargos ={
+            'medicocargo':request.POST['medicocargo'],
+            'medicamentocargo' : request.POST['medicamentocargo'],
+            'otrocargo' : request.POST['otrocargo'],
+            'total':int(request.POST['medicocargo'])+int(request.POST['medicamentocargo'])+int(request.POST['otrocargo'])
+        }
+        listaDatos.update(listaCargos)
+        #para actualizar la base de datos de la cuenta del paciente
+        pDD=models.CuentaPaciente()
+        pDD.idCita=cita
+        pDD.pacienteId=paciente
+        pDD.pacienteNombre=paciente.get_name
+        pDD.medicoAsignadoNombre=medico.user.first_name
+        pDD.medicoAsignadoApellido=medico.user.last_name
+        pDD.domicilio=paciente.domicilio
+        pDD.celular=paciente.celular
+        pDD.sintomas=paciente.sintomas
+        pDD.fechaAdmision=paciente.fechadeadmision
+        pDD.fechaAlta=cita.fechaCita
+        pDD.diasTranscurridos=int(d)
+        pDD.medicamenteos=int(request.POST['medicamentocargo'])
+        pDD.habitacion=int(d)
+        pDD.costomedico=int(request.POST['medicocargo'])
+        pDD.otroscargos=int(request.POST['otrocargo'])
+        pDD.total=int(request.POST['medicocargo'])+int(request.POST['medicamentocargo'])+int(request.POST['otrocargo'])
+        pDD.save()
+        cita.cobrada=True
+        cita.save()
+        return render(request,'asistente_cobrar_cita_final.html',context=listaDatos)
+    return render(request,'asistente_cobrar_cita.html',context=listaDatos)
+
+
+
+#--------------para la cuenta del paciente, convertir a pdf y descargar
+import io
+from xhtml2pdf import pisa
+from django.template.loader import get_template
+from django.template import Context
+from django.http import HttpResponse
+
+
+def render_to_pdf(template_src, context_dict):
+    template = get_template(template_src)
+    html  = template.render(context_dict)
+    result = io.BytesIO()
+    pdf = pisa.pisaDocument(io.BytesIO(html.encode("utf-8")), result)
+    if not pdf.err:
+        return HttpResponse(result.getvalue(), content_type='application/pdf')
+    return
+
+
+
+def asistente_descarga_cobro_view(request,pk):
+    CuentaPaciente=models.CuentaPaciente.objects.get(idCita=pk)
+    dict={
+        'nombrePaciente':CuentaPaciente.pacienteNombre,
+        'medicoAsignadoNombre':CuentaPaciente.medicoAsignadoNombre,
+        'apellidoMedicoAsignado':CuentaPaciente.medicoAsignadoApellido,
+        'domicilio':CuentaPaciente.domicilio,
+        'celular':CuentaPaciente.celular,
+        'sintomas':CuentaPaciente.sintomas,
+        'fechadeAdmision':CuentaPaciente.fechaAdmision,
+        'fechaAlta':CuentaPaciente.fechaAlta,
+        'diastranscurridos':CuentaPaciente.diasTranscurridos,
+        'medicamentocargo':CuentaPaciente.medicamenteos,
+        'habitacioncargo':CuentaPaciente.habitacion,
+        'medicocargo':CuentaPaciente.costomedico,
+        'otroscargo':CuentaPaciente.otroscargos,
+        'total':CuentaPaciente.total,
+    }
+    response = render_to_pdf('descargar_cobro_cita.html',dict)
+    return response
+    return redirect('asistente_citasporcobrar')
+
+
 # ------------- aqui empiezan las vistas de las citas
 @login_required(login_url='asistentelogin')
 @user_passes_test(is_asistente)
@@ -496,7 +593,7 @@ def asistente_menu_citas_view(request):
 @login_required(login_url='asistentelogin')
 @user_passes_test(is_asistente)
 def asistente_ver_citas_view(request):
-    citas=models.Citas.objects.all().filter(status=True)
+    citas=models.Citas.objects.all().filter(status=True).order_by('-idCita')
     return render(request,'asistente_ver_citas.html',{'citas':citas})
 
 
@@ -561,7 +658,7 @@ def asistente_aprobar_citas_view(request):
 @login_required(login_url='asistentelogin')
 @user_passes_test(is_asistente)
 def aprobar_cita_view(request,pk):
-    cita=models.Cita.objects.get(id=pk)
+    cita=models.idCita.objects.get(idCita=pk)
     cita.status=True
     cita.save()
     return redirect(reverse('asistente_aprobar_cita'))

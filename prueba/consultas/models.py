@@ -72,6 +72,7 @@ class Consulta(models.Model):
     
 
 class CuentaPaciente(models.Model):
+    idCita=models.ForeignKey(Citas, on_delete=models.CASCADE, default=0)
     pacienteId=models.ForeignKey(Paciente, on_delete=models.CASCADE, default=0)
     pacienteNombre=models.CharField(max_length=40)
     medicoAsignadoNombre=models.CharField(max_length=40)
