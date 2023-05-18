@@ -136,7 +136,8 @@
         <table>
           <tr>
             <td>
-                Nombre del Paciente : {{pacienteNombre}} {{pacienteApellido}}<br>
+              ID Cita: {{idCita}} <br>
+              Nombre del Paciente : {{pacienteNombre}} {{pacienteApellido}}<br>
               Celular del Paciente : {{celular}}<br>
               Domicilio del Paciente : {{domicilio}}<br>
             </td>
@@ -218,15 +219,8 @@
 </div>
 <br><br>
 <div class="download">
-  <a href="#" onclick="openPdfInNewTab('{{ pdf_url }}')">Abrir PDF en nueva pestaña</a>
-
-  <a style="background:green; width:500px;" href="{% url 'asistente_descarga_cobro' idCita %}">Descargar</a>
+  <a class="btn btn-success" style="width:300px;" href="{% url 'asistente_descarga_cobro' idCita %}" target="_blank">Descargar</a> <br><br>
+  <a class="btn btn-primary" style="width:300px;" href="{% url 'asistente_citasporcobrar' %}">Volver</a>
 </div>
-
-<script>
-  function openPdfInNewTab(pdfUrl) {
-      window.open(pdfUrl, '_blank');
-  }
-</script>
 
 {% endblock content %}

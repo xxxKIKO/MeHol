@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, redirect
+from django.urls import reverse
 from . import forms, models
 from django.db.models import Sum
 from django.contrib.auth.models import Group
@@ -13,6 +14,12 @@ from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
 from .forms import ConsultaForm
 from .models import Citas, Consulta
+
+import io
+from xhtml2pdf import pisa
+from django.template.loader import get_template
+from django.template import Context
+from django.http import HttpResponse
 
 
 # Vista de inicio
@@ -541,11 +548,7 @@ def asistente_cobrar_cita_view(request,pk):
 
 
 #--------------para la cuenta del paciente, convertir a pdf y descargar
-import io
-from xhtml2pdf import pisa
-from django.template.loader import get_template
-from django.template import Context
-from django.http import HttpResponse
+
 
 
 def render_to_pdf(template_src, context_dict):
@@ -562,6 +565,7 @@ def render_to_pdf(template_src, context_dict):
 def asistente_descarga_cobro_view(request,pk):
     CuentaPaciente=models.CuentaPaciente.objects.get(idCita=pk)
     dict={
+        'idCita':pk,
         'nombrePaciente':CuentaPaciente.pacienteNombre,
         'medicoAsignadoNombre':CuentaPaciente.medicoAsignadoNombre,
         'apellidoMedicoAsignado':CuentaPaciente.medicoAsignadoApellido,
@@ -577,9 +581,13 @@ def asistente_descarga_cobro_view(request,pk):
         'otroscargo':CuentaPaciente.otroscargos,
         'total':CuentaPaciente.total,
     }
-    response = render_to_pdf('descargar_cobro_cita.html',dict)
+    #pdf = render_to_pdf('mostrarpdf.html', dict)
+    #response = HttpResponse(pdf, content_type='application/pdf')
+    #response['Content-Disposition'] = 'inline; filename="cobro_cita.pdf"'
+    #citasporcobrar_url = reverse('asistente_citasporcobrar')
+    #return render(request, 'mostrarpdf.html', {'pdf_url': response, 'citasporcobrar_url': citasporcobrar_url})
+    response = render_to_pdf('mostrarpdf.html',dict)
     return response
-    return redirect('asistente_citasporcobrar')
 
 
 # ------------- aqui empiezan las vistas de las citas
@@ -701,7 +709,7 @@ def actualizar_cita_view(request,pk):
 @login_required(login_url='asistentelogin')
 @user_passes_test(is_asistente)
 def asistente_citasporcobrar_view(request):
-    #those whose approval are needed
+    #citas ejecutadas por cobrar
     citas=models.Citas.objects.all().filter(ejecutada=True, cobrada=False)
     return render(request,'asistente_citasporcobrar.html',{'citas':citas})
 #---------------------------------------------------------------------------------
