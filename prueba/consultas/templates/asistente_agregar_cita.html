@@ -30,7 +30,10 @@
               {% render_field CitasForm.pacienteId class="form-control" placeholder="Paciente" %}
             </div>
             <div class="form-group" id="id_fechaCita">
-              {% render_field CitasForm.fechaCita class="form-control" placeholder="Paciente" %}
+              {% render_field CitasForm.fechaCita class="form-control" placeholder="Fecha" %}
+            </div>
+            <div class="form-group" id="ciudadCita">
+              {% render_field CitasForm.ciudadCita class="form-control" placeholder="Ciudad" %}
             </div>
           </div>
           
@@ -44,7 +47,10 @@
 
 
         </div>
-        <button type="submit" class="btn btn-success">Agendar</button>
+        <div style="text-align: center;">
+          <button type="submit" class="btn btn-success">Agendar</button>
+        </div>
+        
       </div>
     </div>
   </div>

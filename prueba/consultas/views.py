@@ -340,6 +340,13 @@ def asistente_agregar_paciente_view(request):
             paciente=pacienteForm.save(commit=False)
             paciente.user=user
             paciente.status=True
+
+            menor_de_edad = request.POST.get('menorEdadCheckbox') == 'on'
+            if not menor_de_edad:
+                paciente.nombreTutor = None
+                paciente.apellidosTutor = None
+                paciente.telefonoTutor = None
+                paciente.celularTutor = None
             paciente.medicoAsignadoId=request.POST.get('medicoAsignadoId')
             paciente.save()
 
@@ -845,6 +852,44 @@ def medico_ver_pacientes_view(request):
     medico_id=medico.user.id
     pacientes=models.Paciente.objects.all().filter(status=True, medicoAsignadoId=medico_id)
     return render(request,'medico_ver_pacientes.html',{'pacientes':pacientes, 'medico':medico})
+
+@login_required(login_url='medicologin')
+@user_passes_test(is_medico)
+def medico_utilidades_view(request):
+    habitacion_total = 0
+    medicamentos_total = 0
+    costomedico_total = 0
+    otros_total = 0
+    #para saber que medico es el que esta logueado
+    medico = models.Medico.objects.get(user__id=request.user.id)
+    medico_id=medico.user.id
+    # Obtener las cuentas de pacientes filtradas
+    cuentas=models.CuentaPaciente.objects.all().filter(idCita__medicoId=medico)
+    # para obtener los pacientes que ha atendido el medico
+    
+    
+    # Calcular los totales por concepto
+    for cuenta in cuentas:
+        habitacion_total += cuenta.habitacion
+        medicamentos_total += cuenta.medicamenteos
+        costomedico_total += cuenta.costomedico
+        otros_total += cuenta.otroscargos
+    
+    # Calcular el gran total
+    gran_total = habitacion_total + medicamentos_total + costomedico_total + otros_total
+
+    # Pasar los resultados a la plantilla
+    context = {
+        'cuentas': cuentas,
+        'habitacion_total': habitacion_total,
+        'medicamentos_total': medicamentos_total,
+        'costomedico_total': costomedico_total,
+        'otros_total': otros_total,
+        'gran_total': gran_total,
+        'medico':medico,
+    }
+
+    return render(request, 'medico_utilidades.html', context)
 #---------------------------------------------------------------------------------
 #------------------------ COMIENZAN LAS VISTAS DEL PACIENTE ----------------------
 #---------------------------------------------------------------------------------

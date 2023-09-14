@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Toma de Foto con Webcam - Ventana Emergente</title>
+  <style>
+    #video {
+      width: 100%;
+      height: auto;
+    }
+
+    #captureButton {
+      display: block;
+      margin: 10px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Toma de Foto con Webcam</h1>
+  <video id="video" autoplay></video>
+  <button id="captureButton">Tomar Foto</button>
+
+  <script>
+    // Obtén los elementos del DOM
+    const video = document.getElementById("video");
+    const captureButton = document.getElementById("captureButton");
+
+    // Accede a la cámara
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(function(stream) {
+        video.srcObject = stream;
+      })
+      .catch(function(err) {
+        console.error("Error accediendo a la cámara: " + err);
+      });
+
+    // Captura la imagen cuando se hace clic en el botón
+    captureButton.addEventListener("click", function() {
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+
+      // Establece el tamaño del canvas según el tamaño del video
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      // Dibuja el video en el canvas
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Convierte la imagen capturada en un Data URL
+      const photoDataURL = canvas.toDataURL();
+
+      // Cierra la ventana emergente y envía el Data URL a la ventana principal
+      window.opener.postMessage({ type: "photoTaken", photoDataURL: photoDataURL }, "*");
+      window.close();
+    });
+  </script>
+</body>
+</html>

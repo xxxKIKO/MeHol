@@ -1,0 +1,98 @@
+{% extends 'medico_base.html' %}
+{% load static %}
+{% block content %}
+{%include 'medico_dashboard_cards.html'%}
+
+<style>
+    .filtros{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+        margin-top: 2em;
+    }
+    #boton{
+        margin-right: auto;
+        margin-left: auto;
+        margin-top: 1em;
+    }
+
+</style>
+<body>
+  <h1 align="center">Utilidades del Médico</h1>
+<section class="filtros">
+  <form method="GET" action="">
+  <!--  <label for="medico">Filtrar por médico:</label>
+    <select name="medico" id="medico">
+      <option value="">Todos</option>
+    </select>
+    -->
+    <label for="paciente">Filtrar por paciente:</label>
+    <select name="paciente" id="paciente">
+        {% for pac in pacientes %}
+            <option value="">{{paciente.pacienteNombre}}</option>
+        {% endfor %}
+      <!-- Agrega aquí opciones para seleccionar pacientes -->
+    </select>
+    
+    <label for="fecha">Filtrar por fecha:</label>
+    <input type="date" name="fecha" id="fecha">
+    
+    <br> <div style="text-align: center;">
+        <button type="submit" class="btn btn-success" id="boton">Filtrar</button>
+    </div>
+  </form>
+</section>
+  <div class="container">
+    <div class="row">
+      <div class="panel panel-primary" style="margin:0 auto;">
+        <div class="panel-heading" style="text-align:center;">
+          <h6 class="panel-title">Citas Pendientes del día</h6>
+        </div>
+            <table class="table table-hover" id="dev-table">
+            <thead>
+            <tr>
+                <th>Paciente</th>
+                <th>Médico</th>
+                <th>Habitación</th>
+                <th>Medicamentos</th>
+                <th>Costo Médico</th>
+                <th>Otros Cargos</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for cuenta in cuentas %}
+            <tr>
+                <td>{{ cuenta.pacienteNombre }}</td>
+                <td>{{ cuenta.medicoAsignadoNombre }}</td>
+                <td>{{ cuenta.habitacion }}</td>
+                <td>{{ cuenta.medicamenteos }}</td>
+                <td>{{ cuenta.costomedico }}</td>
+                <td>{{ cuenta.otroscargos }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <th>Total</th>
+                <th></th>
+                <th>{{ habitacion_total }}</th>
+                <th>{{ medicamentos_total }}</th>
+                <th>{{ costomedico_total }}</th>
+                <th>{{ otros_total }}</th>
+            </tr>
+            <tr>
+                <th>Gran Total</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th>{{ gran_total }}</th>
+            </tr>
+            </tfoot>
+        </table>
+        </div>
+    </div>
+</div>
+</body>
+{% endblock content %}

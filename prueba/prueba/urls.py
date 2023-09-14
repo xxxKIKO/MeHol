@@ -92,6 +92,7 @@ urlpatterns = [
     path('medico_ver_citas', views.medico_ver_citas_view,name='medico_ver_citas'),
     path('medico_actualizar_cita/<int:pk>', views.medico_actualizar_cita_view,name='medico_actualizar_cita'),
     path('medico_ver_pacientes', views.medico_ver_pacientes_view,name='medico_ver_pacientes'),
+    path('medico_utilidades', views.medico_utilidades_view,name='medico_utilidades'),
         #todas las vistas para el calendario
     path('all_events', views.all_events, name='all_events'),
 

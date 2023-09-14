@@ -1,5 +1,5 @@
 from django.db import models
-from datetime import datetime
+from datetime import datetime, date
 from django.contrib.auth.models import User
 
 
@@ -30,13 +30,28 @@ class Medico(models.Model):
 
 class Paciente(models.Model):
     user =models.OneToOneField(User,on_delete=models.CASCADE)
-    foto = models.ImageField(upload_to='fotosdeperfil/fotosdeperfilpacientes/',null=True,blank=True)
-    domicilio = models.CharField(max_length=40)
-    celular = models.CharField(max_length=20,null=False)
-    sintomas = models.CharField(max_length=100,null=False)
+    apmaterno=models.CharField(max_length=20,null=False, default='')
+    fechaNac=models.DateField(default=date.today)
+    domicilio = models.CharField(max_length=40,default='')
+    poblacion = models.CharField(max_length=20,default='')
+    municipio = models.CharField(max_length=20,default='')
+    entidad = models.CharField(max_length=20,default='')
+    pais = models.CharField(max_length=20,default='')
+    telefono = models.CharField(max_length=20,null=False,default='')
+    celular = models.CharField(max_length=20,null=False, default='')
+    sintomas = models.CharField(max_length=100,null=False,default='')
     medicoAsignadoId = models.PositiveIntegerField(null=True)
+    correo = models.CharField(max_length=40,default='')
+    facebook = models.CharField(max_length=40,default='')
+    instagram = models.CharField(max_length=40,default='')
+    pagweb = models.CharField(max_length=40,default='')
     fechadeadmision =models.DateField(auto_now=True)
     status = models.BooleanField(default=False)
+    nombreTutor = models.CharField(max_length=30, blank=True, null=True, default='')
+    apellidosTutor = models.CharField(max_length=30, blank=True, null=True, default='')
+    telefonoTutor = models.CharField(max_length=20, blank=True, null=True, default='')
+    celularTutor = models.CharField(max_length=20, blank=True, null=True, default='')
+    foto = models.ImageField(upload_to='fotosdeperfil/fotosdeperfilpacientes/',null=True,blank=True)
     @property
     def get_name(self):
         return self.user.first_name+" "+self.user.last_name
@@ -46,7 +61,13 @@ class Paciente(models.Model):
     def __str__(self):
         return self.user.first_name+" ("+self.sintomas+")"
 
-
+ciudades=[('Colima','Colima'),
+          ('Guadalajara', 'Guadalajara'),
+          ('Tijuana','Tijuana'),
+          ('México','México'),
+          ('Monterrey','Monterrey'),
+          ('Cd. Guzman','Cd. Guzman'),
+]
 class Citas(models.Model):
     idCita = models.AutoField(primary_key=True)
     pacienteId=models.ForeignKey(Paciente, on_delete=models.CASCADE, default=0)
@@ -54,6 +75,7 @@ class Citas(models.Model):
     pacienteNombre=models.CharField(max_length=40,null=True)
     medicoNombre=models.CharField(max_length=40,null=True)
     fechaCita=models.DateTimeField(default=datetime.now)
+    ciudadCita=models.CharField(max_length=40, choices=ciudades, default='Colima')
     descripcion=models.TextField(max_length=500)
     status=models.BooleanField(default=False)
     ejecutada=models.BooleanField(default=False)

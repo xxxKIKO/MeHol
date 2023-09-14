@@ -1,8 +1,38 @@
 {% extends 'asistente_base.html' %}
 {% load widget_tweaks %}
 {% block content %}
+<style>
+  #captureButton {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 20px;
+    font-size: 16px;
+  }
 
+  #photoForm {
+    display: none;
+    text-align: center;
+  }
+
+  #photoPreview {
+    width: 320px;
+    height: 240px;
+    margin: 10px auto;
+  }
+
+  #saveButton {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+</style>
 <head>
+
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
   <style media="screen">
     a:link {
       text-decoration: none;
@@ -42,10 +72,6 @@
     }
   </style>
 
-  <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
 </head>
 <br><br><br>
 <!------ asistente agrega paciente  ---------->
@@ -54,47 +80,185 @@
   <div class="container register-form">
     <div class="form">
       <div class="note">
-        <p>Admitir un paciente al consultorio</p>
+        <p>Registrar paciente nuevo</p>
       </div>
       <div class="form-content">
         <div class="row">
           <div class="col-md-6">
             <div class="form-group">
-              {% render_field userForm.first_name class="form-control" placeholder="Nombre" %}
+              {% render_field userForm.first_name class="form-control" id="id_first_name" placeholder="Nombre" %}
             </div>
             <div class="form-group">
-              {% render_field userForm.username class="form-control" placeholder="Username" %}
+              {% render_field userForm.last_name class="form-control" id="id_last_name" placeholder="Apellido Paterno" %}
+            </div>
+            <div class="form-group">
+              {% render_field pacienteForm.apmaterno class="form-control" placeholder="Apellido Materno" %}
+            </div>
+            <div class="form-group" id="id_fechaNac">
+              {% render_field pacienteForm.fechaNac class="form-control" placeholder="Fecha de Nacimiento" %}
             </div>
             <div class="form-group">
               {% render_field pacienteForm.domicilio class="form-control" placeholder="Domicilio" %}
             </div>
             <div class="form-group">
-              {% render_field pacienteForm.sintomas class="form-control" placeholder="Sintomas" %}
+              {% render_field pacienteForm.poblacion class="form-control" placeholder="Población" %}
             </div>
             <div class="form-group">
-              {% render_field pacienteForm.foto required="required" class="form-control" placeholder="Foto de Perfil" %}
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="form-group">
-              {% render_field userForm.last_name class="form-control" placeholder="Apellidos" %}
+              {% render_field pacienteForm.municipio class="form-control" placeholder="Municipio" %}
             </div>
             <div class="form-group">
-              {% render_field userForm.password class="form-control" placeholder="Password" %}
+              {% render_field pacienteForm.entidad class="form-control" placeholder="Entidad" %}
+            </div>
+            <div class="form-group">
+              {% render_field pacienteForm.pais class="form-control" placeholder="País" %}
+            </div>
+            <div class="form-group">
+              {% render_field pacienteForm.telefono class="form-control" placeholder="Teléfono" %}
             </div>
             <div class="form-group">
               {% render_field pacienteForm.celular  class="form-control" placeholder="Celular" %}
             </div>
             <div class="form-group">
+              {% render_field pacienteForm.correo  class="form-control" placeholder="Correo Electrónico" %}
+            </div>
+            <div class="form-group">
+              {% render_field pacienteForm.facebook  class="form-control" placeholder="Facebook" %}
+            </div>
+            <div class="form-group">
+              {% render_field pacienteForm.instagram  class="form-control" placeholder="Instagram" %}
+            </div>
+            <div class="form-group">
+              {% render_field pacienteForm.pagweb  class="form-control" placeholder="Página Web" %}
+            </div>
+            <div class="form-group">
+              {% render_field pacienteForm.sintomas class="form-control" placeholder="Sintomas Generales" %}
+            </div>
+            <div class="form-group">
+              {% render_field pacienteForm.foto required="required" class="form-control" placeholder="Foto de Perfil" %}
+            </div>
+            <!--aqui es para capturar la foto con la webcam-->
+            <!-- <div class="form-group">
+              <video id="video" width="320" height="240" autoplay></video>
+              <button id="captureButton" type="button">Capturar foto</button>
+              <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
+            </div> -->
+
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              {% render_field userForm.username class="form-control" placeholder="Username" %}
+            </div>
+            <div class="form-group">
+              {% render_field userForm.password class="form-control" placeholder="Password" %}
+            </div>
+            <div class="form-group">
               {% render_field pacienteForm.medicoAsignadoId class="form-control" placeholder="Médico Asignado" %}
+            </div>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="menorEdadCheckbox" onchange="toggleCamposTutor()"> Menor de edad
+              </label>
+            </div>
+            <div id="camposTutor" style="display: none;" >
+              <div class="form-group">
+                {% render_field pacienteForm.nombreTutor class="form-control" placeholder="Nombre del Tutor" %}
+              </div>
+              <div class="form-group">
+                {% render_field pacienteForm.apellidosTutor class="form-control" placeholder="Apellidos del Tutor" %}
+              </div>
+              <div class="form-group">
+                {% render_field pacienteForm.telefonoTutor class="form-control" placeholder="Teléfono del Tutor" %}
+              </div>
+              <div class="form-group">
+                {% render_field pacienteForm.celularTutor class="form-control" placeholder="Celular del Tutor" %}
+              </div>
             </div>
           </div>
         </div>
-        <button type="submit" class="btnSubmit">Registrar</button>
+        <div style="text-align: center;">
+          <button type="submit" class="btnSubmit">Registrar</button>
+        </div>
       </div>
     </div>
   </div>
-
 </form>
+<script>
+window.onload = function() {
+    // Mostrar y desactivar campos del tutor por defecto
+    disableTutorFields();
+  };
+
+  function toggleCamposTutor() {
+    var camposTutor = document.getElementById("camposTutor");
+    var checkbox = document.getElementById("menorEdadCheckbox");
+
+    if (checkbox.checked) {
+      camposTutor.style.display = "block";
+      enableTutorFields();
+    } else {
+      camposTutor.style.display = "none";
+      disableTutorFields();
+    }
+  }
+
+  function enableTutorFields() {
+    var tutorInputs = document.querySelectorAll("#camposTutor input");
+    for (var i = 0; i < tutorInputs.length; i++) {
+      tutorInputs[i].disabled = false;
+      tutorInputs[i].value = "";
+    }
+  }
+
+  function disableTutorFields() {
+    var tutorInputs = document.querySelectorAll("#camposTutor input");
+    for (var i = 0; i < tutorInputs.length; i++) {
+      tutorInputs[i].disabled = true;
+      tutorInputs[i].value = "";
+    }
+  }
+ // Obtén los elementos del DOM
+  const video = document.getElementById("video");
+  const captureButton = document.getElementById("captureButton");
+  const canvas = document.getElementById("canvas");
+  const context = canvas.getContext("2d");
+
+  // Accede a la cámara
+  // navigator.mediaDevices.getUserMedia({ video: true })
+  //   .then(function(stream) {
+  //     video.srcObject = stream;
+  //   })
+  //   .catch(function(err) {
+  //     console.error("Error accediendo a la cámara: " + err);
+  //   });
+
+  // // Captura la imagen cuando se hace clic en el botón
+  // captureButton.addEventListener("click", function() {
+  //   context.drawImage(video, 0, 0, 320, 240);
+  //   // Detén el flujo de video
+  //   const stream = video.srcObject;
+  //   const tracks = stream.getTracks();
+  //   tracks.forEach(function(track) {
+  //     track.stop();
+  //   });
+  //   video.srcObject = null;
+  //   // Convierte la imagen capturada en un archivo y agrega el archivo al formulario
+  //   canvas.toBlob(function(blob) {
+  //     const fileInput = document.getElementById("id_foto");
+  //     const pacienteFirstName = document.getElementById("id_first_name").value;
+  //     const pacienteLastName = document.getElementById("id_last_name").value;
+  //     const fileName = `${pacienteFirstName}_${pacienteLastName}.png`;
+  //     const file = new File([blob], fileName, { type: "image/png" });
+  //     fileInput.files = [file];
+  //   });
+  // });
+  </script>
+</body>
+</html>
+
+
+
+
 
 {% endblock content %}
+
+  

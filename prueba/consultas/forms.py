@@ -38,13 +38,17 @@ class PacienteUserForm(forms.ModelForm):
         'password': forms.PasswordInput()
         }
 class PacienteForm(forms.ModelForm):
-    #this is the extrafield for linking patient and their assigend doctor
-    #this will show dropdown __str__ method doctor model is shown on html so override it
-    #to_field_name this will fetch corresponding value  user_id present in Doctor model and return it
     medicoAsignadoId=forms.ModelChoiceField(queryset=models.Medico.objects.all().filter(status=True),empty_label="Médico y Especialidad", to_field_name="user_id")
+    nombreTutor: forms.CharField(required=False)
+    apellidosTutor: forms.CharField(required=False)
+    telefonoTutor: forms.CharField(required=False)
+    celularTutor: forms.CharField(required=False)
     class Meta:
+        widgets = {
+        'fechaNac': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
+        }
         model=models.Paciente
-        fields=['domicilio','celular','status','sintomas','foto']
+        fields=['domicilio','poblacion','municipio','entidad','pais','telefono','apmaterno','fechaNac','celular','correo','facebook','instagram','pagweb','status','sintomas','foto','nombreTutor','apellidosTutor','telefonoTutor','celularTutor']
 
 
 
@@ -56,7 +60,7 @@ class CitasForm(forms.ModelForm):
             'fechaCita': forms.DateTimeInput(attrs={'type': 'datetime-local','step': '1800'},format='%Y-%m-%dT%H:00:00')
         }
         model=models.Citas
-        fields=['descripcion','status','fechaCita']
+        fields=['descripcion','status','fechaCita','ciudadCita']
 
     def __str__(self):
         return self.pacienteId
