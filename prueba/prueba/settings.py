@@ -86,12 +86,12 @@ WSGI_APPLICATION = 'prueba.wsgi.application'
 
 DATABASES = {
     'default': {
-        # dj_database_url.config(
-        #     default='postgresql://postgres:postgres@localhost/postgres',
-        #     conn_max_age=600
-        # )
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        dj_database_url.config(
+            default='postgresql://postgres:postgres@localhost/postgres',
+            conn_max_age=600
+        )
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -133,7 +133,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 if not DEBUG:
-        STATIC_ROOT = os.path.join(STATIC_URL, 'staticfiles')
+        STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
         STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 STATICFILES_DIRS=[STATIC_DIR,]
